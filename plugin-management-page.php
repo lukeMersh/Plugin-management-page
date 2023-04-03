@@ -42,6 +42,12 @@ function pmp_plugin_admin_init(){
     // register our settings
     register_setting('pmp_plugin_options', 'pmp_plugin_options', $args);
 
+	function pmp_plugin_validate_options( $input ) {
+		// Sanitize the input
+		$input[ 'name' ] = sanitize_text_field( $input[ 'name' ] );
+		return $input;
+	}
+
     //Add a settings section
     add_settings_section(
             'pmp_plugin_main',
@@ -66,12 +72,13 @@ function pmp_plugin_admin_init(){
 
     // Display and fill the Name form field
     function pmp_plugin_setting_name() {
+
 //get options 'text string' value from thr database
-        $options = get_option('pmp_plugin_option');
-        $name = $options['name'];
+        $options = get_option( 'pmp_plugin_option' );
+        $name = isset($options['name']) ? $options['name']: '';
 
         //echo the field
-        echo "<input id='name' name='pmp_plugin_options[name]' type= 'text' value='" . esc_attr($name) . "'/>";
+        echo "<input id='name' name='pmp_plugin_options[name]' type= 'text' value='" . esc_attr( $name ) . "'/>";
 
     }
 }
