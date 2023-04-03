@@ -43,7 +43,23 @@ function pmp_plugin_admin_init(){
     register_setting('pmp_plugin_options', 'pmp_plugin_options', $args);
 
 	function pmp_plugin_validate_options( $input ) {
+        $valid['name'] = preg_replace(   //3/4/23
+                '/[^a-zA-Z\s',
+            '',
+            $input['name'] );
+
+        if ($valid['name'] !== $input['name'] ) {
+            add_settings_error(
+                    'pmp_plugin_text_string',
+                'pmp_plugin_texterror',
+                'Incorrect value entered! Please only input letters and spaces',
+                'error'
+            );
+        } // 3/4/23
+return  $valid;
+
 		// Sanitize the input
+        //Improving validation errors 3/4/23
 		$input[ 'name' ] = sanitize_text_field( $input[ 'name' ] );
 		return $input;
 	}
@@ -64,6 +80,46 @@ function pmp_plugin_admin_init(){
         'pmp_plugin',
         'pmp_plugin_main'
     );
+
+    // create our settings field for favourite holiday 3/4/23
+    add_settings_field(
+            'pmp_plugin_fav_holiday',
+        'Favourite Holiday',
+        'pmp_plugin_setting_fav_holiday',
+        'pmp_plugin',
+        'pmp_plugin_main'
+    );
+    // creating our settings field for beast mode 3/4/23
+    add_settings_field(
+            'pmp_plugin_beast_mode',
+        'Enable Beast mode?',
+        'pmp_plugin_setting_beast_mode',
+        'pmp_plugin',
+        'pmp_plugin_main'
+    );
+
+    // display and select the favourite holiday select field
+    function pmp_plugin_setting_fav_holiday(){
+        // get option 'fav holiday' value from the database
+        //set to halloween as a default if the option does not exist
+
+        $options = get_option('pmp_plugin_options', ['fav_holiday' => 'Halloween']);
+        $fav_holiday =isset ($options['fav_holiday']) ? $options['fav_holiday'] : '';
+
+        // define the select option values for favourite holiday
+        $items = array('Halloween', 'Christmas','New Years');
+
+        echo "<select id='fav_holiday' name='pmp_plugin_options[fav_holiday]'>";
+        foreach ($items as $item){
+            //loop through the option values
+            //if saved option matches the option value select it
+            echo "<option value='" .$item. "' "
+                .selected($fav_holiday, $item, false).">" . esc_html($item) .
+                 "</option>";
+        }
+        echo "</select>";
+    }
+
 
     //draw section header
     function pmp_plugin_section_text(){
